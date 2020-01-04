@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO.Ports;
 using System.Drawing.Imaging;
+using System.Management;
 
 namespace MATH_LED
 {
@@ -27,7 +28,7 @@ namespace MATH_LED
             string[] ports = SerialPort.GetPortNames();
             portComboBox.Items.AddRange(ports);
             init_serial();
-            //init_color_wheel();
+            colorPicker.HSV = new HSVColorPicker.HSVparam(1.5, 125, 0.5);
         }
 
         private void init_serial()
@@ -35,6 +36,26 @@ namespace MATH_LED
             MATHLED.port = new SerialPort();
             MATHLED.port_DataReceivedHandler = new SerialDataReceivedEventHandler(port_DataReceived);
             MATHLED.port.DataReceived += port_DataReceivedHandler;
+            //Try to find arduino and auto connect
+            ManagementObjectSearcher manObjSearch = new ManagementObjectSearcher("Select * from Win32_SerialPort");
+            ManagementObjectCollection manObjReturn = manObjSearch.Get();
+            foreach (ManagementObject manObj in manObjReturn)
+            {
+                if (manObj["Description"].ToString().Contains("Arduino") && port.IsOpen == false)
+                {
+                    Console.WriteLine("Found Arduino on: " + manObj["Name"].ToString());
+                    //Disable button
+                    string commPortTarget = manObj["DeviceID"].ToString();
+                    toggleConnectionButton.Enabled = false;
+                    portComboBox.SelectedIndex = portComboBox.Items.IndexOf(commPortTarget);
+                    //MATHLED.port.PortName = commPortTarget;
+                    //MATHLED.port.BaudRate = 57600;
+                    //MATHLED.port.Open();
+                    connect_serial(commPortTarget);
+                    toggleConnectionButton.Enabled = true;
+                    toggleConnectionButton.Text = "Disconnect";
+                }
+            }
         }
 
         private void connect_serial(string port_name)
@@ -50,6 +71,8 @@ namespace MATH_LED
                 MATHLED.port.BaudRate = 57600;
                 MATHLED.port.Open();
                 Console.WriteLine("Connection Opened: " + port_name);
+                //Refresh UI
+                sendToArduino(new byte[] { 2 });
             }
         }
 
@@ -60,11 +83,17 @@ namespace MATH_LED
             //PrintByteArray(data);
             //Console.WriteLine(Encoding.UTF8.GetString(data));
             byte[] data = receiveFromArduino();
+            Console.WriteLine("Received from Arduino:");
             PrintByteArray(data);
-            if (data[1] == 7 && data[2] == 0)
+            if (data[1] == 0)
+            {
+                PrintByteArray(data.Skip(2).Take(data.Length - 3).ToArray());
+                Console.WriteLine(Encoding.ASCII.GetString(data.Skip(2).Take(data.Length - 3).ToArray()));
+            }
+            if (data[1] == 9 && data[2] == 0)
             {
                 //Status update, update program - 7 params and the first should be 0
-                //onoff,now_playing,delay_ms,hue,saturation,value,red,green,blue
+                //onoff,now_playing,delayMillis,delta,hue,saturation,value
                 if (data[3] > 0) 
                 {
                     powerRadioOn.CheckedChanged -= powerRadioOn_CheckedChanged;
@@ -76,72 +105,184 @@ namespace MATH_LED
                     powerRadioOff.CheckedChanged += powerRadioOff_CheckedChanged;
                 }
                 if (data[4] == 0) 
-                { 
-                    typeRadioRainbow.Invoke((MethodInvoker)delegate { typeRadioRainbow.Checked = true; }); 
+                {
+                    typeRadioRainbow.CheckedChanged -= typeRadioRainbow_CheckedChanged;
+                    typeRadioRainbow.Invoke((MethodInvoker)delegate { typeRadioRainbow.Checked = true; });
+                    typeRadioRainbow.CheckedChanged += typeRadioRainbow_CheckedChanged;
                 }
                 else if (data[4] == 1) 
                 {
+                    typeRadioSolid.CheckedChanged -= typeRadioSolid_CheckedChanged;
                     typeRadioSolid.Invoke((MethodInvoker)delegate { typeRadioSolid.Checked = true; });
+                    typeRadioSolid.CheckedChanged += typeRadioSolid_CheckedChanged;
                 }
-                else if (data[4] == 2) {
-                    typeRadioPulse.Invoke((MethodInvoker)delegate { typeRadioPulse.Checked = true; });
-                }
-                if (data[5] > -1)
+                else if (data[4] == 2)
                 {
-                    //Delay ms
+                    typeRadioPulse.CheckedChanged -= typeRadioPulse_CheckedChanged;
+                    typeRadioPulse.Invoke((MethodInvoker)delegate { typeRadioPulse.Checked = true; });
+                    typeRadioPulse.CheckedChanged += typeRadioPulse_CheckedChanged;
                 }
-                colorPicker.HSV = new HSVColorPicker.HSVparam(data[6], data[7], data[8]);
+                trackBar_Delay.ValueChanged -= trackBar_Delay_ValueChanged;
+                trackBar_Delay.Invoke((MethodInvoker)delegate { trackBar_Delay.Value = data[5]; });
+                trackBar_Delay.ValueChanged += trackBar_Delay_ValueChanged;
+                label_Delay.Invoke((MethodInvoker)delegate { label_Delay.Text = "Delay    " + trackBar_Delay.Value; });
+                trackBar_Delta.ValueChanged -= trackBar_Delta_ValueChanged;
+                trackBar_Delta.Invoke((MethodInvoker)delegate { trackBar_Delta.Value = data[6]; });
+                trackBar_Delta.ValueChanged += trackBar_Delta_ValueChanged;
+                label_Delta.Invoke((MethodInvoker)delegate { label_Delta.Text = "Delta    " + trackBar_Delta.Value; });
+                trackBar_Rate.ValueChanged -= trackBar_Rate_ValueChanged;
+                trackBar_Rate.Invoke((MethodInvoker)delegate { trackBar_Rate.Value = data[7]; });
+                trackBar_Rate.ValueChanged += trackBar_Rate_ValueChanged;
+                label_Rate.Invoke((MethodInvoker)delegate { label_Rate.Text = "Rate     " + trackBar_Rate.Value; });
+                //Set colors as floats
+                double tempHue = (data[8] / 255.0) * 6; //Hue should be between 0 and 6
+                double tempSat = data[9] / 255.0; //Sat and val should be between 0 and 1
+                double tempVal = data[10] / 255.0;
+                //Console.WriteLine("Hue: " + tempHue);
+                colorPicker.HSV = new HSVColorPicker.HSVparam(tempHue, tempSat, tempVal);
             }
+        }
+
+        private void PrintByteArray(byte[] bytes)
+        {
+            var sb = new StringBuilder("new byte[] { ");
+            foreach (var b in bytes)
+            {
+                sb.Append(b + ", ");
+            }
+            sb.Append("}");
+            Console.WriteLine(sb.ToString());
+        }
+
+        private void sendToArduino(byte[] message)
+        {
+            if (port.IsOpen)
+            {
+                byte txLen = (byte)message.Length;
+                List<byte> assembledMessage = new List<byte>();
+                assembledMessage.Add(startMarker);
+                assembledMessage.Add(txLen);
+                assembledMessage.AddRange(encodeHighBytes(message));
+                assembledMessage.Add(endMarker);
+                byte[] bytesToSend = assembledMessage.ToArray();
+                Console.WriteLine("Sending to Arduino:    ");
+                PrintByteArray(bytesToSend);
+                port.Write(bytesToSend, 0, bytesToSend.Length);
+            } 
+        }
+
+        private byte[] receiveFromArduino()
+        {
+            List<byte> buffer = new List<byte>();
+            byte x = (byte)'z';
+            int byteCount = -1;
+            // Wait for start byte
+            //Console.WriteLine("Received Byte, waiting for start");
+            while ((byte)x != startMarker && (byte)x != endMarker)
+            {
+                //Console.WriteLine("Received Byte, start");
+                x = (byte)port.ReadByte(); //port.Read(buffer,0,1);
+                //Console.WriteLine("Received Byte, " + x);
+                // Save data until end marker found
+                while ((byte)x != endMarker)
+                {
+                    //Console.WriteLine("Received Byte, byte is not end");
+                    buffer.Add(x);
+                    x = (byte)port.ReadByte(); //x = port.Read(buffer, 0, 1);
+                    //Console.WriteLine("Received Byte, " + x);
+                    byteCount++;
+                }
+                //Console.WriteLine("Received Byte, end");
+                // Save end marker
+                buffer.Add(x);
+            }
+            //Console.WriteLine("Received Byte, exiting loops");
+            return decodeHighBytes(buffer.ToArray());
+        }
+
+        private byte[] encodeHighBytes(byte[] input)
+        {
+            List<byte> output = new List<byte>();
+            int inputLen = input.Length;
+            for (int i = 0; i < inputLen; i++)
+            {
+                int x = input[i];
+                if (x >= (int)specialByte)
+                {
+                    output.Add(specialByte);
+                    output.Add((byte)(x - specialByte));
+                }
+                else
+                {
+                    output.Add((byte)x);
+                }
+            }
+            //Console.WriteLine("Encode: input:  ");
+            //PrintByteArray(input);
+            //Console.WriteLine("Encode: output: ");
+            //PrintByteArray(output.ToArray());
+            return output.ToArray();
+        }
+
+        private byte[] decodeHighBytes(byte[] input)
+        {
+            List<byte> output = new List<byte>();
+            int inputLen = input.Length;
+            int x;
+            for (int i = 0; i < inputLen; i++)
+            {
+                if ((int)input[i] == specialByte)
+                {
+                    i++;
+                    x = (int)(specialByte + (int)input[i]);
+                }
+                else
+                {
+                    x = (int)input[i];
+                }
+                output.Add((byte)x);
+            }
+            return output.ToArray();
         }
 
         private void typeRadioSolid_CheckedChanged(object sender, EventArgs e) //Solid
         {
-            if (port.IsOpen && typeRadioSolid.Checked)
+            if (typeRadioSolid.Checked)
             {
-                //port.Write("solid");
-                sendToArduino(new byte[] { 10 });
-                Console.WriteLine("Sent: solid");
+                sendToArduino(new byte[] { 50 });
+            }
+        }
+
+        private void typeRadioRainbow_CheckedChanged(object sender, EventArgs e) //Rainbow
+        {
+            if (typeRadioRainbow.Checked)
+            {
+                sendToArduino(new byte[] { 51 });
             }
         }
 
         private void typeRadioPulse_CheckedChanged(object sender, EventArgs e) //Cylon/Pulse
         {
 
-            if (port.IsOpen && typeRadioPulse.Checked)
+            if (typeRadioPulse.Checked)
             {
-                //port.Write("cylon");
-                sendToArduino(new byte[] { 11 });
-                Console.WriteLine("Sent: cylon");
-            }
-        }
-
-        private void typeRadioRainbow_CheckedChanged(object sender, EventArgs e) //Rainbow
-        {
-            if (port.IsOpen && typeRadioRainbow.Checked)
-            {
-                //port.Write("rainbow");
-                sendToArduino(new byte[] { 12 });
-                Console.WriteLine("Sent: rainbow");
+                sendToArduino(new byte[] { 52 });
             }
         }
 
         private void powerRadioOn_CheckedChanged(object sender, EventArgs e)
         {
-            if (port.IsOpen && powerRadioOn.Checked)
+            if (powerRadioOn.Checked)
             {
-                //port.Write("on");
                 sendToArduino(new byte[] { 1 });
-                Console.WriteLine("Sent: on");
             }
         }
 
         private void powerRadioOff_CheckedChanged(object sender, EventArgs e)
         {
-            if (port.IsOpen && powerRadioOff.Checked)
+            if (powerRadioOff.Checked)
             {
-                //port.Write("off");
                 sendToArduino(new byte[] { 0 });
-                Console.WriteLine("Sent: off");
             }
         }
 
@@ -164,133 +305,46 @@ namespace MATH_LED
         private void colorPicker_HSVColorChanged(object sender, HSVColorChangedEventArgs e)
         {
             Console.WriteLine("Color Changed: " + e);
+            HSVColorPicker.HSVparam hsvColours = colorPicker.HSV;
+            // h: 0 - 6, s: 0 - 1, v: 0 - 1
+            //Console.WriteLine(hsvColours.H);
+            // Calculate and send H, S, V values
+            int hue = (int) Math.Round((Math.Max(0, Math.Min(1, (hsvColours.H / 6))) * 255));
+            int sat = (int) Math.Round(hsvColours.S * 255);
+            int val = (int) Math.Round(hsvColours.V * 255);
+            //Console.WriteLine(hue); 
+            sendToArduino(new byte[] { 4, (byte)hue, (byte)sat, (byte)val });
         }
 
-        private void PrintByteArray(byte[] bytes)
-        {
-            var sb = new StringBuilder("new byte[] { ");
-            foreach (var b in bytes)
-            {
-                sb.Append(b + ", ");
-            }
-            sb.Append("}");
-            Console.WriteLine(sb.ToString());
-        }
-
-        private void sendToArduino(byte[] message)
-        {
-            byte txLen = (byte)message.Length;
-            //byte[] adjMessage = encodeHighBytes(message);
-            List<byte> assembledMessage = new List<byte>();
-            assembledMessage.Add(startMarker);
-            assembledMessage.Add(txLen);
-            assembledMessage.AddRange(encodeHighBytes(message));
-            assembledMessage.Add(endMarker);
-            byte[] bytesToSend = assembledMessage.ToArray();
-            Console.WriteLine("Sending to Arduino:    ");
-            PrintByteArray(bytesToSend);
-            port.Write(bytesToSend,0,bytesToSend.Length);
-
-            //char txLen = (char)message.Length;
-            //string adjMessage = encodeHighBytes(message);
-            //Console.WriteLine((byte)startMarker + "-" + (byte)txLen + "-" + adjMessage + "-" + (byte)endMarker);
-
-            //char[] prefix = new char[] { (char)startMarker, txLen };
-            //string prefixString = new string(prefix);
-            //char[] charMessage = adjMessage.ToCharArray();
-            //char[] postfix = new char[] { (char)endMarker };
-            //string postfixString = new string(postfix);
-            //adjMessage = prefixString + adjMessage + postfixString;
-            ////adjMessage = (char)startMarker + (char)txLen + adjMessage + (char)endMarker;
-            ////byte[] messageBytes = new byte[] { (byte)startMarker, (byte)txLen, Encoding.UTF8.GetBytes(adjMessage), (byte)endMarker };
-            ////adjMessage = Encoding.UTF8.GetString(messageBytes);
-            //Console.WriteLine(adjMessage);
-            //PrintByteArray(Encoding.UTF8.GetBytes(adjMessage));
-            //port.Write(adjMessage);
-        }
-
-        private byte[] receiveFromArduino()
-        {
-            List<byte> buffer = new List<byte>();
-            byte x = (byte)'z';
-            int byteCount = -1;
-            // Wait for start byte
-            Console.WriteLine("Received Byte, waiting for start");
-            while ((byte)x != startMarker && (byte)x != endMarker)
-            {
-                Console.WriteLine("Received Byte, start");
-                x = (byte)port.ReadByte(); //port.Read(buffer,0,1);
-                Console.WriteLine("Received Byte, " + x);
-                // Save data until end marker found
-                while ((byte)x != endMarker)
-                {
-                    //Console.WriteLine("Received Byte, byte is not end");
-                    buffer.Add(x);
-                    x = (byte)port.ReadByte(); //x = port.Read(buffer, 0, 1);
-                    Console.WriteLine("Received Byte, " + x);
-                    byteCount++;
-                }
-                Console.WriteLine("Received Byte, end");
-                // Save end marker
-                buffer.Add(x);
-            }
-            Console.WriteLine("Received Byte, exiting loops");
-            return decodeHighBytes(buffer.ToArray());
-        }
-
-        private byte[] encodeHighBytes(byte[] input)
-        {
-            List<byte> output = new List<byte>();
-            int inputLen = input.Length;
-            for (int i = 0; i < inputLen; i++)
-            {
-                int x = input[i];
-                if (x >= (int)specialByte)
-                {
-                    //output = output + (char)specialByte;
-                    output.Add(specialByte);
-                    //output = output + (char)(x - specialByte);
-                    output.Add((byte)(x - specialByte));
-                } else
-                {
-                    //output = output + (char)x;
-                    output.Add((byte)x);
-                }
-            }
-            Console.WriteLine("Encode: input:  ");
-            PrintByteArray(input);
-            Console.WriteLine("Encode: output: ");
-            PrintByteArray(output.ToArray());
-            return output.ToArray();
-        }
-
-        private byte[] decodeHighBytes(byte[] input)
-        {
-            List<byte> output = new List<byte>();
-            int inputLen = input.Length;
-            int x;
-            for (int i = 0; i < inputLen; i++)
-            {
-                if ((int)input[i] == specialByte)
-                {
-                    i++;
-                    x = (int)(specialByte + (int)input[i]);
-                } else
-                {
-                    x = (int)input[i];
-                }
-                output.Add((byte)x);
-            }
-            return output.ToArray();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
+        private void button_Refresh_Clicked(object sender, EventArgs e)
         {
             sendToArduino(new byte[] { 2 });
-            //sendToArduino(Encoding.UTF8.GetBytes("Hello"));
+        }
+
+        private void trackBar_Delay_ValueChanged(object sender, EventArgs e)
+        {
+            sendToArduino(new byte[] { 8, (byte)trackBar_Delay.Value });
+            label_Delay.Text = "Delay    " + trackBar_Delay.Value; 
+        }
+
+        private void trackBar_Delta_ValueChanged(object sender, EventArgs e)
+        {
+            sendToArduino(new byte[] { 9, (byte)trackBar_Delta.Value });
+            label_Delta.Text = "Delta    " + trackBar_Delta.Value;
+        }
+
+        private void trackBar_Rate_ValueChanged(object sender, EventArgs e)
+        {
+            sendToArduino(new byte[] {10, (byte)trackBar_Rate.Value });
+            label_Rate.Text = "Rate     " + trackBar_Rate.Value;
         }
     }
 
+
+
+    /**
+     * HSV color picker form component https://github.com/tk-yoshimura/ColorFieldGUI
+     **/
     public class ColorPicker
     {
         public int Size { get; }

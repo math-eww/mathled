@@ -34,18 +34,29 @@
             this.title = new System.Windows.Forms.Label();
             this.powerRadioOn = new System.Windows.Forms.RadioButton();
             this.powerRadioOff = new System.Windows.Forms.RadioButton();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.tableLayoutPanel_Programs = new System.Windows.Forms.TableLayoutPanel();
+            this.tableLayoutPanel_Power = new System.Windows.Forms.TableLayoutPanel();
+            this.flowLayoutPanel_Connect = new System.Windows.Forms.FlowLayoutPanel();
             this.portComboBox = new System.Windows.Forms.ComboBox();
             this.toggleConnectionButton = new System.Windows.Forms.Button();
             this.colorPickerPanel = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
             this.colorPicker = new MATH_LED.HSVColorPicker();
-            this.tableLayoutPanel1.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
-            this.flowLayoutPanel1.SuspendLayout();
+            this.button_Refresh = new System.Windows.Forms.Button();
+            this.trackBar_Delta = new System.Windows.Forms.TrackBar();
+            this.trackBar_Delay = new System.Windows.Forms.TrackBar();
+            this.tableLayoutPanel_Slider = new System.Windows.Forms.TableLayoutPanel();
+            this.label_Delta = new System.Windows.Forms.Label();
+            this.label_Delay = new System.Windows.Forms.Label();
+            this.label_Rate = new System.Windows.Forms.Label();
+            this.trackBar_Rate = new System.Windows.Forms.TrackBar();
+            this.tableLayoutPanel_Programs.SuspendLayout();
+            this.tableLayoutPanel_Power.SuspendLayout();
+            this.flowLayoutPanel_Connect.SuspendLayout();
             this.colorPickerPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_Delta)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_Delay)).BeginInit();
+            this.tableLayoutPanel_Slider.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_Rate)).BeginInit();
             this.SuspendLayout();
             // 
             // typeRadioSolid
@@ -87,7 +98,7 @@
             // title
             // 
             this.title.AutoSize = true;
-            this.title.Location = new System.Drawing.Point(12, 9);
+            this.title.Location = new System.Drawing.Point(12, 352);
             this.title.Name = "title";
             this.title.Size = new System.Drawing.Size(109, 13);
             this.title.TabIndex = 4;
@@ -117,60 +128,60 @@
             this.powerRadioOff.UseVisualStyleBackColor = true;
             this.powerRadioOff.CheckedChanged += new System.EventHandler(this.powerRadioOff_CheckedChanged);
             // 
-            // tableLayoutPanel1
+            // tableLayoutPanel_Programs
             // 
-            this.tableLayoutPanel1.ColumnCount = 1;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.Controls.Add(this.typeRadioSolid, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.typeRadioPulse, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.typeRadioRainbow, 0, 2);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(15, 25);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 3;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(158, 69);
-            this.tableLayoutPanel1.TabIndex = 15;
+            this.tableLayoutPanel_Programs.ColumnCount = 1;
+            this.tableLayoutPanel_Programs.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel_Programs.Controls.Add(this.typeRadioSolid, 0, 0);
+            this.tableLayoutPanel_Programs.Controls.Add(this.typeRadioPulse, 0, 2);
+            this.tableLayoutPanel_Programs.Controls.Add(this.typeRadioRainbow, 0, 2);
+            this.tableLayoutPanel_Programs.Location = new System.Drawing.Point(12, 12);
+            this.tableLayoutPanel_Programs.Name = "tableLayoutPanel_Programs";
+            this.tableLayoutPanel_Programs.RowCount = 3;
+            this.tableLayoutPanel_Programs.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel_Programs.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel_Programs.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel_Programs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel_Programs.Size = new System.Drawing.Size(158, 69);
+            this.tableLayoutPanel_Programs.TabIndex = 15;
             // 
-            // tableLayoutPanel2
+            // tableLayoutPanel_Power
             // 
-            this.tableLayoutPanel2.ColumnCount = 1;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel2.Controls.Add(this.powerRadioOn, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.powerRadioOff, 0, 1);
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(15, 236);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 2;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(158, 48);
-            this.tableLayoutPanel2.TabIndex = 16;
+            this.tableLayoutPanel_Power.ColumnCount = 1;
+            this.tableLayoutPanel_Power.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel_Power.Controls.Add(this.powerRadioOn, 0, 0);
+            this.tableLayoutPanel_Power.Controls.Add(this.powerRadioOff, 0, 1);
+            this.tableLayoutPanel_Power.Location = new System.Drawing.Point(538, 12);
+            this.tableLayoutPanel_Power.Name = "tableLayoutPanel_Power";
+            this.tableLayoutPanel_Power.RowCount = 2;
+            this.tableLayoutPanel_Power.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel_Power.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel_Power.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel_Power.Size = new System.Drawing.Size(158, 48);
+            this.tableLayoutPanel_Power.TabIndex = 16;
             // 
-            // flowLayoutPanel1
+            // flowLayoutPanel_Connect
             // 
-            this.flowLayoutPanel1.Controls.Add(this.portComboBox);
-            this.flowLayoutPanel1.Controls.Add(this.toggleConnectionButton);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(15, 287);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(158, 76);
-            this.flowLayoutPanel1.TabIndex = 17;
+            this.flowLayoutPanel_Connect.Controls.Add(this.portComboBox);
+            this.flowLayoutPanel_Connect.Controls.Add(this.toggleConnectionButton);
+            this.flowLayoutPanel_Connect.Location = new System.Drawing.Point(538, 66);
+            this.flowLayoutPanel_Connect.Name = "flowLayoutPanel_Connect";
+            this.flowLayoutPanel_Connect.Size = new System.Drawing.Size(158, 76);
+            this.flowLayoutPanel_Connect.TabIndex = 17;
             // 
             // portComboBox
             // 
             this.portComboBox.FormattingEnabled = true;
             this.portComboBox.Location = new System.Drawing.Point(3, 3);
             this.portComboBox.Name = "portComboBox";
-            this.portComboBox.Size = new System.Drawing.Size(121, 21);
+            this.portComboBox.Size = new System.Drawing.Size(151, 21);
             this.portComboBox.TabIndex = 0;
             // 
             // toggleConnectionButton
             // 
             this.toggleConnectionButton.Location = new System.Drawing.Point(3, 30);
             this.toggleConnectionButton.Name = "toggleConnectionButton";
-            this.toggleConnectionButton.Size = new System.Drawing.Size(121, 40);
+            this.toggleConnectionButton.Size = new System.Drawing.Size(151, 40);
             this.toggleConnectionButton.TabIndex = 1;
             this.toggleConnectionButton.Text = "Connect";
             this.toggleConnectionButton.UseVisualStyleBackColor = true;
@@ -182,46 +193,130 @@
             this.colorPickerPanel.Controls.Add(this.colorPicker);
             this.colorPickerPanel.Location = new System.Drawing.Point(179, 9);
             this.colorPickerPanel.Name = "colorPickerPanel";
-            this.colorPickerPanel.Size = new System.Drawing.Size(353, 354);
+            this.colorPickerPanel.Size = new System.Drawing.Size(353, 356);
             this.colorPickerPanel.TabIndex = 18;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(713, 415);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 19;
-            this.button1.Text = "Test";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // colorPicker
             // 
-            this.colorPicker.Location = new System.Drawing.Point(0, 0);
+            this.colorPicker.Location = new System.Drawing.Point(-3, 3);
             this.colorPicker.Name = "colorPicker";
             this.colorPicker.Size = new System.Drawing.Size(350, 350);
             this.colorPicker.TabIndex = 0;
-            this.colorPicker.HSVColorChanged += colorPicker_HSVColorChanged;
+            this.colorPicker.HSVColorChanged += new MATH_LED.HSVColorChangedHandler(this.colorPicker_HSVColorChanged);
+            // 
+            // button_Refresh
+            // 
+            this.button_Refresh.Location = new System.Drawing.Point(15, 326);
+            this.button_Refresh.Name = "button_Refresh";
+            this.button_Refresh.Size = new System.Drawing.Size(75, 23);
+            this.button_Refresh.TabIndex = 19;
+            this.button_Refresh.Text = "Refresh";
+            this.button_Refresh.UseVisualStyleBackColor = true;
+            this.button_Refresh.Click += new System.EventHandler(this.button_Refresh_Clicked);
+            // 
+            // trackBar_Delta
+            // 
+            this.trackBar_Delta.Location = new System.Drawing.Point(3, 31);
+            this.trackBar_Delta.Maximum = 60;
+            this.trackBar_Delta.Name = "trackBar_Delta";
+            this.trackBar_Delta.Size = new System.Drawing.Size(151, 37);
+            this.trackBar_Delta.TabIndex = 21;
+            this.trackBar_Delta.ValueChanged += new System.EventHandler(this.trackBar_Delta_ValueChanged);
+            // 
+            // trackBar_Delay
+            // 
+            this.trackBar_Delay.Location = new System.Drawing.Point(3, 102);
+            this.trackBar_Delay.Maximum = 100;
+            this.trackBar_Delay.Name = "trackBar_Delay";
+            this.trackBar_Delay.Size = new System.Drawing.Size(151, 37);
+            this.trackBar_Delay.TabIndex = 22;
+            this.trackBar_Delay.ValueChanged += new System.EventHandler(this.trackBar_Delay_ValueChanged);
+            // 
+            // tableLayoutPanel_Slider
+            // 
+            this.tableLayoutPanel_Slider.ColumnCount = 1;
+            this.tableLayoutPanel_Slider.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel_Slider.Controls.Add(this.trackBar_Rate, 0, 5);
+            this.tableLayoutPanel_Slider.Controls.Add(this.label_Rate, 0, 4);
+            this.tableLayoutPanel_Slider.Controls.Add(this.label_Delta, 0, 0);
+            this.tableLayoutPanel_Slider.Controls.Add(this.label_Delay, 0, 2);
+            this.tableLayoutPanel_Slider.Controls.Add(this.trackBar_Delta, 0, 1);
+            this.tableLayoutPanel_Slider.Controls.Add(this.trackBar_Delay, 0, 3);
+            this.tableLayoutPanel_Slider.Location = new System.Drawing.Point(538, 148);
+            this.tableLayoutPanel_Slider.Name = "tableLayoutPanel_Slider";
+            this.tableLayoutPanel_Slider.RowCount = 6;
+            this.tableLayoutPanel_Slider.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 13.33333F));
+            this.tableLayoutPanel_Slider.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel_Slider.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 13.33333F));
+            this.tableLayoutPanel_Slider.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel_Slider.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 13.33333F));
+            this.tableLayoutPanel_Slider.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel_Slider.Size = new System.Drawing.Size(158, 217);
+            this.tableLayoutPanel_Slider.TabIndex = 23;
+            // 
+            // label_Delta
+            // 
+            this.label_Delta.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label_Delta.AutoSize = true;
+            this.label_Delta.Location = new System.Drawing.Point(63, 7);
+            this.label_Delta.Name = "label_Delta";
+            this.label_Delta.Size = new System.Drawing.Size(32, 13);
+            this.label_Delta.TabIndex = 24;
+            this.label_Delta.Text = "Delta";
+            // 
+            // label_Delay
+            // 
+            this.label_Delay.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label_Delay.AutoSize = true;
+            this.label_Delay.Location = new System.Drawing.Point(62, 78);
+            this.label_Delay.Name = "label_Delay";
+            this.label_Delay.Size = new System.Drawing.Size(34, 13);
+            this.label_Delay.TabIndex = 25;
+            this.label_Delay.Text = "Delay";
+            // 
+            // label_Rate
+            // 
+            this.label_Rate.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label_Rate.AutoSize = true;
+            this.label_Rate.Location = new System.Drawing.Point(43, 99);
+            this.label_Rate.Name = "label_Rate";
+            this.label_Rate.Size = new System.Drawing.Size(20, 9);
+            this.label_Rate.TabIndex = 26;
+            this.label_Rate.Text = "Rate";
+            // 
+            // trackBar_Rate
+            // 
+            this.trackBar_Rate.Location = new System.Drawing.Point(3, 173);
+            this.trackBar_Rate.Maximum = 100;
+            this.trackBar_Rate.Name = "trackBar_Rate";
+            this.trackBar_Rate.Size = new System.Drawing.Size(151, 41);
+            this.trackBar_Rate.TabIndex = 27;
             // 
             // MATHLED
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.button1);
+            this.ClientSize = new System.Drawing.Size(710, 372);
+            this.Controls.Add(this.tableLayoutPanel_Slider);
+            this.Controls.Add(this.button_Refresh);
             this.Controls.Add(this.colorPickerPanel);
-            this.Controls.Add(this.flowLayoutPanel1);
-            this.Controls.Add(this.tableLayoutPanel2);
-            this.Controls.Add(this.tableLayoutPanel1);
+            this.Controls.Add(this.flowLayoutPanel_Connect);
+            this.Controls.Add(this.tableLayoutPanel_Power);
+            this.Controls.Add(this.tableLayoutPanel_Programs);
             this.Controls.Add(this.title);
             this.Name = "MATHLED";
             this.Text = "MATHSOFT LED CONTROL";
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.tableLayoutPanel2.PerformLayout();
-            this.flowLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel_Programs.ResumeLayout(false);
+            this.tableLayoutPanel_Programs.PerformLayout();
+            this.tableLayoutPanel_Power.ResumeLayout(false);
+            this.tableLayoutPanel_Power.PerformLayout();
+            this.flowLayoutPanel_Connect.ResumeLayout(false);
             this.colorPickerPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_Delta)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_Delay)).EndInit();
+            this.tableLayoutPanel_Slider.ResumeLayout(false);
+            this.tableLayoutPanel_Slider.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_Rate)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -234,15 +329,22 @@
         private System.Windows.Forms.RadioButton typeRadioRainbow;
         private System.Windows.Forms.Label title;
         private System.Windows.Forms.RadioButton powerRadioOn;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel_Programs;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel_Power;
         private System.Windows.Forms.RadioButton powerRadioOff;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel_Connect;
         private System.Windows.Forms.ComboBox portComboBox;
         private System.Windows.Forms.Button toggleConnectionButton;
         private System.Windows.Forms.Panel colorPickerPanel;
         private HSVColorPicker colorPicker;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button_Refresh;
+        private System.Windows.Forms.TrackBar trackBar_Delta;
+        private System.Windows.Forms.TrackBar trackBar_Delay;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel_Slider;
+        private System.Windows.Forms.Label label_Delta;
+        private System.Windows.Forms.Label label_Delay;
+        private System.Windows.Forms.TrackBar trackBar_Rate;
+        private System.Windows.Forms.Label label_Rate;
     }
 }
 
