@@ -106,21 +106,45 @@ namespace MATH_LED
                 }
                 if (data[4] == 0) 
                 {
-                    typeRadioRainbow.CheckedChanged -= typeRadioRainbow_CheckedChanged;
-                    typeRadioRainbow.Invoke((MethodInvoker)delegate { typeRadioRainbow.Checked = true; });
-                    typeRadioRainbow.CheckedChanged += typeRadioRainbow_CheckedChanged;
-                }
-                else if (data[4] == 1) 
-                {
                     typeRadioSolid.CheckedChanged -= typeRadioSolid_CheckedChanged;
                     typeRadioSolid.Invoke((MethodInvoker)delegate { typeRadioSolid.Checked = true; });
                     typeRadioSolid.CheckedChanged += typeRadioSolid_CheckedChanged;
+                }
+                else if (data[4] == 1) 
+                {
+                    typeRadioRainbow.CheckedChanged -= typeRadioRainbow_CheckedChanged;
+                    typeRadioRainbow.Invoke((MethodInvoker)delegate { typeRadioRainbow.Checked = true; });
+                    typeRadioRainbow.CheckedChanged += typeRadioRainbow_CheckedChanged;
                 }
                 else if (data[4] == 2)
                 {
                     typeRadioPulse.CheckedChanged -= typeRadioPulse_CheckedChanged;
                     typeRadioPulse.Invoke((MethodInvoker)delegate { typeRadioPulse.Checked = true; });
                     typeRadioPulse.CheckedChanged += typeRadioPulse_CheckedChanged;
+                }
+                else if (data[4] == 3)
+                {
+                    typeRadioTwinkle.CheckedChanged -= typeRadioTwinkle_CheckedChanged;
+                    typeRadioTwinkle.Invoke((MethodInvoker)delegate { typeRadioTwinkle.Checked = true; });
+                    typeRadioTwinkle.CheckedChanged += typeRadioTwinkle_CheckedChanged;
+                }
+                else if (data[4] == 4)
+                {
+                    typeRadioPlasma.CheckedChanged -= typeRadioPlasma_CheckedChanged;
+                    typeRadioPlasma.Invoke((MethodInvoker)delegate { typeRadioPlasma.Checked = true; });
+                    typeRadioPlasma.CheckedChanged += typeRadioPlasma_CheckedChanged;
+                }
+                else if (data[4] == 5)
+                {
+                    typeRadioDot.CheckedChanged -= typeRadioDot_CheckedChanged;
+                    typeRadioDot.Invoke((MethodInvoker)delegate { typeRadioDot.Checked = true; });
+                    typeRadioDot.CheckedChanged += typeRadioDot_CheckedChanged;
+                }
+                else if (data[4] == 6)
+                {
+                    typeRadioFire.CheckedChanged -= typeRadioFire_CheckedChanged;
+                    typeRadioFire.Invoke((MethodInvoker)delegate { typeRadioFire.Checked = true; });
+                    typeRadioFire.CheckedChanged += typeRadioFire_CheckedChanged;
                 }
                 trackBar_Delay.ValueChanged -= trackBar_Delay_ValueChanged;
                 trackBar_Delay.Invoke((MethodInvoker)delegate { trackBar_Delay.Value = data[5]; });
@@ -217,10 +241,6 @@ namespace MATH_LED
                     output.Add((byte)x);
                 }
             }
-            //Console.WriteLine("Encode: input:  ");
-            //PrintByteArray(input);
-            //Console.WriteLine("Encode: output: ");
-            //PrintByteArray(output.ToArray());
             return output.ToArray();
         }
 
@@ -245,7 +265,7 @@ namespace MATH_LED
             return output.ToArray();
         }
 
-        private void typeRadioSolid_CheckedChanged(object sender, EventArgs e) //Solid
+        private void typeRadioSolid_CheckedChanged(object sender, EventArgs e)
         {
             if (typeRadioSolid.Checked)
             {
@@ -253,7 +273,7 @@ namespace MATH_LED
             }
         }
 
-        private void typeRadioRainbow_CheckedChanged(object sender, EventArgs e) //Rainbow
+        private void typeRadioRainbow_CheckedChanged(object sender, EventArgs e)
         {
             if (typeRadioRainbow.Checked)
             {
@@ -261,12 +281,43 @@ namespace MATH_LED
             }
         }
 
-        private void typeRadioPulse_CheckedChanged(object sender, EventArgs e) //Cylon/Pulse
+        private void typeRadioPulse_CheckedChanged(object sender, EventArgs e)
         {
-
             if (typeRadioPulse.Checked)
             {
                 sendToArduino(new byte[] { 52 });
+            }
+        }
+
+        private void typeRadioTwinkle_CheckedChanged(object sender, EventArgs e)
+        {
+            if (typeRadioTwinkle.Checked)
+            {
+                sendToArduino(new byte[] { 53 });
+            }
+        }
+
+        private void typeRadioPlasma_CheckedChanged(object sender, EventArgs e)
+        {
+            if (typeRadioPlasma.Checked)
+            {
+                sendToArduino(new byte[] { 54 });
+            }
+        }
+
+        private void typeRadioDot_CheckedChanged(object sender, EventArgs e)
+        {
+            if (typeRadioDot.Checked)
+            {
+                sendToArduino(new byte[] { 55 });
+            }
+        }
+
+        private void typeRadioFire_CheckedChanged(object sender, EventArgs e)
+        {
+            if (typeRadioFire.Checked)
+            {
+                sendToArduino(new byte[] { 56 });
             }
         }
 
@@ -306,13 +357,11 @@ namespace MATH_LED
         {
             Console.WriteLine("Color Changed: " + e);
             HSVColorPicker.HSVparam hsvColours = colorPicker.HSV;
-            // h: 0 - 6, s: 0 - 1, v: 0 - 1
-            //Console.WriteLine(hsvColours.H);
+            // h: 0 - 6, s: 0 - 1, v: 0 - 1\
             // Calculate and send H, S, V values
             int hue = (int) Math.Round((Math.Max(0, Math.Min(1, (hsvColours.H / 6))) * 255));
             int sat = (int) Math.Round(hsvColours.S * 255);
             int val = (int) Math.Round(hsvColours.V * 255);
-            //Console.WriteLine(hue); 
             sendToArduino(new byte[] { 4, (byte)hue, (byte)sat, (byte)val });
         }
 
